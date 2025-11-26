@@ -1,0 +1,91 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Logs & local data
+*.log
+logs/
+.coverage
+htmlcov/
+
+# JavaScript/TypeScript artifacts
+node_modules/
+dashboard/node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+npm-debug.log*
+
+# IDE / Editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Vite / build outputs
+dashboard/dist/
+
+# Media recordings
+*.mov
+*.mp4
+video-rec.mov
+poc_demo.mov
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Data files (encrypted/sensitive)
+kyc_extraction_results.json
+kyc_extraction_results_masked.json
+*.encrypted
+*.key
+
+# Images (if containing sensitive data)
+# Uncomment if you don't want to commit test images
+# images/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
