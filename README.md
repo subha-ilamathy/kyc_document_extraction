@@ -32,7 +32,7 @@ KYC PoC powered by Fireworks AI vision models.
 
 ## Demo Video
 
-[![Watch the demo](./thumbnial.png)](https://drive.google.com/file/d/YOUR_DEMO_ID/view?usp=sharing "View the full walkthrough on Google Drive")
+[![Watch the demo](./thumbnail.png)](https://drive.google.com/file/d/1XhET9Fb1xxjjVIUdyn3srXS9JeEVgLKt/view?usp=sharing "View the full walkthrough on Google Drive")
 
 > Replace `YOUR_DEMO_ID` with your shared Drive video ID. For offline review, you can still drop a local recording at `poc_demo.mov` (gitignored) and open it directly.
 
