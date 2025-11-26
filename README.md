@@ -32,10 +32,10 @@ KYC PoC powered by Fireworks AI vision models.
 
 ## Demo Video
 
+
 [![Watch the demo](./thumbnail.png)](https://drive.google.com/file/d/1XhET9Fb1xxjjVIUdyn3srXS9JeEVgLKt/view?usp=sharing "View the full walkthrough on Google Drive")
 
-> Replace `YOUR_DEMO_ID` with your shared Drive video ID. For offline review, you can still drop a local recording at `poc_demo.mov` (gitignored) and open it directly.
-
+Here's the demo: [View the video](https://drive.google.com/file/d/1XhET9Fb1xxjjVIUdyn3srXS9JeEVgLKt/view?usp=sharing).
 
 
 ## System Design
@@ -48,58 +48,32 @@ KYC PoC powered by Fireworks AI vision models.
 - **Post-processing & enrichment**: FastAPI validates the AI output, attaches latency/model metadata, and caches previews so the UI can visualize the model’s rationale in sync.
 
 ```mermaid
-flowchart TB
-    subgraph RowTop["Row 1"]
-        direction LR
-        subgraph Pre["Pre-processing"]
-            U((Upload))
-            EXIF[EXIF fix]
-            Resize[Adaptive resize]
-            Norm[Channel normalize]
-            Base64[Base64 encode]
-        end
+graph LR
+    U((Upload)) --> EXIF[EXIF fix]
+    EXIF --> Resize[Adaptive resize]
+    Resize --> Norm[Channel normalize]
+    Norm --> Base64[Base64 encode]
 
-        subgraph Prompting["Prompt Selection"]
-            Hint[Doc hint]
-            Template[Template forge<br/>schema + bbox rules]
-        end
-    end
+    Base64 --> Hint{Doc hint}
+    Hint --> Template[Prompt template<br/>schema + bbox rules]
+    Template --> Model[qwen2p5-vl-32b-instruct]
 
-    subgraph RowBottom["Row 2"]
-        direction LR
-        subgraph Inference["Fireworks OCR"]
-            Model[qwen2p5-vl-32b-instruct]
-        end
+    Model --> Validate[Schema validate]
+    Validate --> Metadata[Latency + model tags]
+    Metadata --> Cache[Preview cache]
+    Cache --> Viz[Bounding-box UI & history]
 
-        subgraph Post["Post-processing"]
-            Validate[Schema validate]
-            Metadata[Latency + model tags]
-            Cache[Preview cache]
-        end
-
-        subgraph UI["Visualization"]
-            Viz[Bounding-box UI<br/>History sync]
-        end
-    end
-
-    U --> EXIF --> Resize --> Norm --> Base64
-    Base64 --> Hint
-    Hint --> Template
-    Template --> Model
-    Model --> Validate
-    Validate --> Metadata --> Cache --> Viz
-
-    classDef pre fill:#0f172a,stroke:#0f172a,color:#f8fafc;
+    classDef stage fill:#0f172a,stroke:#0f172a,color:#f8fafc;
     classDef prompt fill:#1d4ed8,stroke:#1d4ed8,color:#f8fafc;
     classDef infer fill:#9333ea,stroke:#9333ea,color:#fdf4ff;
     classDef post fill:#0f766e,stroke:#0f766e,color:#f0fdf4;
     classDef ui fill:#f97316,stroke:#ea580c,color:#fff7ed;
 
-    class Pre,EXIF,Resize,Norm,Base64 pre;
-    class Prompting,Hint,Template prompt;
-    class Inference,Model infer;
-    class Post,Validate,Metadata,Cache post;
-    class UI,Viz ui;
+    class U,EXIF,Resize,Norm,Base64 stage;
+    class Hint,Template prompt;
+    class Model infer;
+    class Validate,Metadata,Cache post;
+    class Viz ui;
 ```
 
 ### Architecture View
