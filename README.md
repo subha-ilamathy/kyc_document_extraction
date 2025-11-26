@@ -40,47 +40,12 @@ Here's the demo: [View the video](https://drive.google.com/file/d/1XhET9Fb1xxjjV
 
 ## System Design
 
-### OCR Flow (Prompts + Processing)
-
-- **AI-driven pre-processing**: EXIF-aware orientation fixes, adaptive resizing, and dynamic channel normalization feed the model a normalized tensor every time.
-- **Prompt-programmed extraction**: doc-type heuristics generate guardrailed prompts that spell out JSON schemas, bounding-box syntax, and “no masking” rules to steer the LMM.
-- **Structured inference**: the Fireworks vision-language model returns typed fields with optional confidence hints and `[x1,y1,x2,y2]` provenance for each entity.
-- **Post-processing & enrichment**: FastAPI validates the AI output, attaches latency/model metadata, and caches previews so the UI can visualize the model’s rationale in sync.
-
-```mermaid
-graph LR
-    U((Upload)) --> EXIF[EXIF fix]
-    EXIF --> Resize[Adaptive resize]
-    Resize --> Norm[Channel normalize]
-    Norm --> Base64[Base64 encode]
-
-    Base64 --> Hint{Doc hint}
-    Hint --> Template[Prompt template<br/>schema + bbox rules]
-    Template --> Model[qwen2p5-vl-32b-instruct]
-
-    Model --> Validate[Schema validate]
-    Validate --> Metadata[Latency + model tags]
-    Metadata --> Cache[Preview cache]
-    Cache --> Viz[Bounding-box UI & history]
-
-    classDef stage fill:#0f172a,stroke:#0f172a,color:#f8fafc;
-    classDef prompt fill:#1d4ed8,stroke:#1d4ed8,color:#f8fafc;
-    classDef infer fill:#9333ea,stroke:#9333ea,color:#fdf4ff;
-    classDef post fill:#0f766e,stroke:#0f766e,color:#f0fdf4;
-    classDef ui fill:#f97316,stroke:#ea580c,color:#fff7ed;
-
-    class U,EXIF,Resize,Norm,Base64 stage;
-    class Hint,Template prompt;
-    class Model infer;
-    class Validate,Metadata,Cache post;
-    class Viz ui;
-```
 
 ### Architecture View
 
 ```mermaid
 flowchart LR
-    subgraph Frontend["Frontend (Lovable React)"]
+    subgraph Frontend["Frontend (React)"]
         UI[Upload Widget] --> State[Realtime State Manager]
         State --> Canvas[Bounding Box Visualizer]
         State --> History[Document History Grid]
@@ -88,6 +53,8 @@ flowchart LR
 
     subgraph Backend["FastAPI Backend"]
         API[/POST /api/upload/]
+        PreBlock{{Pre-processing<br/>EXIF + resize + normalize}}
+        PromptBlock{{Prompt builder<br/>schema + bbox rules}}
         Store[(In-memory Doc Store)]
         Worker[Background Processor]
     end
@@ -97,7 +64,9 @@ flowchart LR
     end
 
     UI -->|File + metadata| API
-    API --> Worker
+    API --> PreBlock
+    PreBlock --> PromptBlock
+    PromptBlock --> Worker
     Worker -->|Image + prompt| Model
     Model -->|JSON fields + bbox| Worker
     Worker --> Store
